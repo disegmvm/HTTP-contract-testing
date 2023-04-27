@@ -62,24 +62,18 @@ func Test_SomeKeysPresence(t *testing.T) {
 		return
 	}
 
-	//var ma map[string]dsl.Matcher
-	//
-	//ma["title"] = dsl.Like("any string")
-	//ma["id"] = dsl.Like("any string")
-	//ma["color"] = dsl.Like("any string")
-	//
-	//ma2 := dsl.MapMatcher{ma}
+	ma2 := make(map[string]dsl.Matcher)
+	ma2["title"] = dsl.Like("any string")
+	ma2["idd"] = dsl.Like("any string")
+	ma2["color"] = dsl.Like("any string")
 
-	cars := []dsl.MapMatcher{
-		{"title": dsl.Like("any string"),
-			"id":    dsl.Like("any string"),
-			"color": dsl.Like("any string")},
-		{},
+	res := []map[string]dsl.Matcher{
+		ma2, ma2,
 	}
 
 	pact.
 		AddInteraction().
-		Given("Validate SOME keys are present").
+		Given("Validate SOME keys are present, we don't care there are other additional keys present").
 		UponReceiving("A GET request").
 		WithRequest(dsl.Request{
 			Method: "GET",
@@ -90,7 +84,7 @@ func Test_SomeKeysPresence(t *testing.T) {
 		}).
 		WillRespondWith(dsl.Response{
 			Status: 200,
-			Body:   cars,
+			Body:   res,
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
 			},

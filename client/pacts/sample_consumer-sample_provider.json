@@ -34,10 +34,11 @@
         "body": [
           {
             "color": "any string",
-            "id": "any string",
             "title": "any string"
           },
           {
+            "color": "any string",
+            "title": "any string"
           }
         ],
         "matchingRules": {
@@ -48,10 +49,13 @@
           "$.body[0].color": {
             "match": "type"
           },
-          "$.body[0].id": {
+          "$.body[0].title": {
             "match": "type"
           },
-          "$.body[0].title": {
+          "$.body[1].color": {
+            "match": "type"
+          },
+          "$.body[1].title": {
             "match": "type"
           }
         }
