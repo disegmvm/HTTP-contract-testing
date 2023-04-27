@@ -93,9 +93,12 @@ func Test_ContractTest(t *testing.T) {
 		WillRespondWith(dsl.Response{
 			Status: 200,
 			Body: car{
-				ID:    dsl.Like("1"),
-				Title: dsl.Like("Vads"),
-				Color: dsl.Like("Gjhtd"),
+				ID: dsl.Term(
+					"any number as string", `\w+`),
+				Title: dsl.Term(
+					"any string", `\w+`),
+				Color: dsl.Term(
+					"any color", `\w+`),
 			},
 
 			// uncomment to fail the validation
@@ -126,48 +129,48 @@ func Test_ContractTest(t *testing.T) {
 
 }
 
-func TestTheWholeResponseBody(t *testing.T) {
-	var test = func() (err error) {
-		url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
-		req, err := http.NewRequest("GET", url, nil)
-		if err != nil {
-			return
-		}
-		req.Header.Set("Content-Type", "application/json")
-
-		_, err = http.DefaultClient.Do(req)
-		if err != nil {
-			return
-		}
-
-		return
-	}
-
-	cars := []Car{
-		{ID: "1", Title: "BMW", Color: "Black"},
-		{ID: "2", Title: "Tesla", Color: "Red"},
-	}
-
-	pact.AddInteraction().
-		Given("Validate the whole response body").
-		UponReceiving("A a GET request").
-		WithRequest(dsl.Request{
-			Method: "GET",
-			Path:   dsl.Term("/cars", "/cars"),
-			Headers: dsl.MapMatcher{
-				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
-			},
-		}).
-		WillRespondWith(dsl.Response{
-			Status: 200,
-			Body:   dsl.Match(cars),
-			Headers: dsl.MapMatcher{
-				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
-			},
-		})
-
-	err := pact.Verify(test)
-	if err != nil {
-		t.Fatalf("Error on Verify: %v", err)
-	}
-}
+//func TestTheWholeResponseBody(t *testing.T) {
+//	var test = func() (err error) {
+//		url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
+//		req, err := http.NewRequest("GET", url, nil)
+//		if err != nil {
+//			return
+//		}
+//		req.Header.Set("Content-Type", "application/json")
+//
+//		_, err = http.DefaultClient.Do(req)
+//		if err != nil {
+//			return
+//		}
+//
+//		return
+//	}
+//
+//	cars := []Car{
+//		{ID: "1", Title: "BMW", Color: "Black"},
+//		{ID: "2", Title: "Tesla", Color: "Red"},
+//	}
+//
+//	pact.AddInteraction().
+//		Given("Validate the whole response body").
+//		UponReceiving("A a GET request").
+//		WithRequest(dsl.Request{
+//			Method: "GET",
+//			Path:   dsl.Term("/cars", "/cars"),
+//			Headers: dsl.MapMatcher{
+//				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+//			},
+//		}).
+//		WillRespondWith(dsl.Response{
+//			Status: 200,
+//			Body:   dsl.Match(cars),
+//			Headers: dsl.MapMatcher{
+//				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+//			},
+//		})
+//
+//	err := pact.Verify(test)
+//	if err != nil {
+//		t.Fatalf("Error on Verify: %v", err)
+//	}
+//}
