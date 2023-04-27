@@ -1,0 +1,109 @@
+I, [2023-04-27T12:42:08.419460 #6732]  INFO -- : Registered expected interaction GET /cars
+D, [2023-04-27T12:42:08.419837 #6732] DEBUG -- : {
+  "description": "A GET request to provider",
+  "providerState": "Valid request",
+  "request": {
+    "method": "GET",
+    "path": {
+      "json_class": "Pact::Term",
+      "data": {
+        "generate": "/cars",
+        "matcher": {
+          "json_class": "Regexp",
+          "o": 0,
+          "s": "/cars"
+        }
+      }
+    },
+    "headers": {
+      "Content-Type": {
+        "json_class": "Pact::Term",
+        "data": {
+          "generate": "application/json; charset=utf-8",
+          "matcher": {
+            "json_class": "Regexp",
+            "o": 0,
+            "s": "application\\/json"
+          }
+        }
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": {
+        "json_class": "Pact::Term",
+        "data": {
+          "generate": "application/json; charset=utf-8",
+          "matcher": {
+            "json_class": "Regexp",
+            "o": 0,
+            "s": "application\\/json"
+          }
+        }
+      }
+    },
+    "body": {
+      "id": {
+        "json_class": "Pact::SomethingLike",
+        "contents": "1"
+      },
+      "title": {
+        "json_class": "Pact::SomethingLike",
+        "contents": "Vads"
+      },
+      "color": {
+        "json_class": "Pact::SomethingLike",
+        "contents": "Gjhtd"
+      }
+    }
+  },
+  "metadata": null
+}
+I, [2023-04-27T12:42:08.420731 #6732]  INFO -- : Received request GET /cars
+D, [2023-04-27T12:42:08.420916 #6732] DEBUG -- : {
+  "path": "/cars",
+  "query": "",
+  "method": "get",
+  "headers": {
+    "Content-Type": "application/json",
+    "Host": "localhost:44599",
+    "User-Agent": "Go-http-client/1.1",
+    "Accept-Encoding": "gzip",
+    "Version": "HTTP/1.1"
+  }
+}
+I, [2023-04-27T12:42:08.421157 #6732]  INFO -- : Found matching response for GET /cars
+D, [2023-04-27T12:42:08.421302 #6732] DEBUG -- : {
+  "status": 200,
+  "headers": {
+    "Content-Type": {
+      "json_class": "Pact::Term",
+      "data": {
+        "generate": "application/json; charset=utf-8",
+        "matcher": {
+          "json_class": "Regexp",
+          "o": 0,
+          "s": "application\\/json"
+        }
+      }
+    }
+  },
+  "body": {
+    "id": {
+      "json_class": "Pact::SomethingLike",
+      "contents": "1"
+    },
+    "title": {
+      "json_class": "Pact::SomethingLike",
+      "contents": "Vads"
+    },
+    "color": {
+      "json_class": "Pact::SomethingLike",
+      "contents": "Gjhtd"
+    }
+  }
+}
+I, [2023-04-27T12:42:08.422065 #6732]  INFO -- : Verifying - interactions matched
+I, [2023-04-27T12:42:08.422617 #6732]  INFO -- : Cleared interactions

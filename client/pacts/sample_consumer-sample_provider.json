@@ -1,0 +1,62 @@
+{
+  "consumer": {
+    "name": "Sample Consumer"
+  },
+  "provider": {
+    "name": "Sample Provider"
+  },
+  "interactions": [
+    {
+      "description": "A GET request to provider",
+      "providerState": "Valid request",
+      "request": {
+        "method": "GET",
+        "path": "/cars",
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "matchingRules": {
+          "$.path": {
+            "match": "regex",
+            "regex": "\\/cars"
+          },
+          "$.headers.Content-Type": {
+            "match": "regex",
+            "regex": "application\\/json"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "body": {
+          "id": "1",
+          "title": "Vads",
+          "color": "Gjhtd"
+        },
+        "matchingRules": {
+          "$.headers.Content-Type": {
+            "match": "regex",
+            "regex": "application\\/json"
+          },
+          "$.body.id": {
+            "match": "type"
+          },
+          "$.body.title": {
+            "match": "type"
+          },
+          "$.body.color": {
+            "match": "type"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}
