@@ -8,17 +8,17 @@
   "interactions": [
     {
       "description": "A GET request",
-      "providerState": "Validate SOME values and keys are present",
+      "providerState": "Validate title only",
       "request": {
         "method": "GET",
-        "path": "/cars",
+        "path": "/cars/1",
         "headers": {
           "Content-Type": "application/json; charset=utf-8"
         },
         "matchingRules": {
           "$.path": {
             "match": "regex",
-            "regex": "\\/cars"
+            "regex": "\\/cars\\/[0-9]+"
           },
           "$.headers.Content-Type": {
             "match": "regex",
@@ -31,13 +31,9 @@
         "headers": {
           "Content-Type": "application/json; charset=utf-8"
         },
-        "body": [
-          {
-            "title": "BMW"
-          },
-          {
-          }
-        ],
+        "body": {
+          "title": "BMW"
+        },
         "matchingRules": {
           "$.headers.Content-Type": {
             "match": "regex",
@@ -48,17 +44,17 @@
     },
     {
       "description": "A GET request",
-      "providerState": "Validate SOME keys are present",
+      "providerState": "Validate all keys are present",
       "request": {
         "method": "GET",
-        "path": "/cars",
+        "path": "/cars/1",
         "headers": {
           "Content-Type": "application/json; charset=utf-8"
         },
         "matchingRules": {
           "$.path": {
             "match": "regex",
-            "regex": "\\/cars"
+            "regex": "\\/cars\\/[0-9]+"
           },
           "$.headers.Content-Type": {
             "match": "regex",
@@ -71,40 +67,27 @@
         "headers": {
           "Content-Type": "application/json; charset=utf-8"
         },
-        "body": [
-          {
-            "color": "any string",
-            "id": "any string",
-            "title": "any string"
-          },
-          {
-            "color": "any string",
-            "id": "any string",
-            "title": "any string"
-          }
-        ],
+        "body": {
+          "color": "Yellow",
+          "id": "300",
+          "title": "Toyota"
+        },
         "matchingRules": {
           "$.headers.Content-Type": {
             "match": "regex",
             "regex": "application\\/json"
           },
-          "$.body[0].color": {
-            "match": "type"
+          "$.body.color": {
+            "match": "regex",
+            "regex": "\\w+"
           },
-          "$.body[0].id": {
-            "match": "type"
+          "$.body.id": {
+            "match": "regex",
+            "regex": "\\w+"
           },
-          "$.body[0].title": {
-            "match": "type"
-          },
-          "$.body[1].color": {
-            "match": "type"
-          },
-          "$.body[1].id": {
-            "match": "type"
-          },
-          "$.body[1].title": {
-            "match": "type"
+          "$.body.title": {
+            "match": "regex",
+            "regex": "\\w+"
           }
         }
       }
@@ -114,14 +97,14 @@
       "providerState": "Match the whole response body",
       "request": {
         "method": "GET",
-        "path": "/cars",
+        "path": "/cars/1",
         "headers": {
           "Content-Type": "application/json; charset=utf-8"
         },
         "matchingRules": {
           "$.path": {
             "match": "regex",
-            "regex": "\\/cars"
+            "regex": "\\/cars\\/[0-9]+"
           },
           "$.headers.Content-Type": {
             "match": "regex",
@@ -134,91 +117,15 @@
         "headers": {
           "Content-Type": "application/json; charset=utf-8"
         },
-        "body": [
-          {
-            "id": "1",
-            "title": "BMW",
-            "color": "Black"
-          },
-          {
-            "id": "2",
-            "title": "Tesla",
-            "color": "Red"
-          }
-        ],
-        "matchingRules": {
-          "$.headers.Content-Type": {
-            "match": "regex",
-            "regex": "application\\/json"
-          }
-        }
-      }
-    },
-    {
-      "description": "A GET request",
-      "providerState": "Validate ALL keys are present",
-      "request": {
-        "method": "GET",
-        "path": "/cars",
-        "headers": {
-          "Content-Type": "application/json; charset=utf-8"
+        "body": {
+          "id": "1",
+          "title": "BMW",
+          "color": "Black"
         },
         "matchingRules": {
-          "$.path": {
-            "match": "regex",
-            "regex": "\\/cars"
-          },
           "$.headers.Content-Type": {
             "match": "regex",
             "regex": "application\\/json"
-          }
-        }
-      },
-      "response": {
-        "status": 200,
-        "headers": {
-          "Content-Type": "application/json; charset=utf-8"
-        },
-        "body": [
-          {
-            "id": "any string",
-            "title": "any string",
-            "color": "any color"
-          },
-          {
-            "id": "any string",
-            "title": "any string",
-            "color": "any color"
-          }
-        ],
-        "matchingRules": {
-          "$.headers.Content-Type": {
-            "match": "regex",
-            "regex": "application\\/json"
-          },
-          "$.body[0].id": {
-            "match": "regex",
-            "regex": "\\w+"
-          },
-          "$.body[0].title": {
-            "match": "regex",
-            "regex": "\\w+"
-          },
-          "$.body[0].color": {
-            "match": "regex",
-            "regex": "\\w+"
-          },
-          "$.body[1].id": {
-            "match": "regex",
-            "regex": "\\w+"
-          },
-          "$.body[1].title": {
-            "match": "regex",
-            "regex": "\\w+"
-          },
-          "$.body[1].color": {
-            "match": "regex",
-            "regex": "\\w+"
           }
         }
       }

@@ -52,7 +52,8 @@ func TestServerPact_Verification(t *testing.T) {
 
 func startProvider() {
 	router = gin.Default()
-	router.GET("/cars", getCars)
+	router.GET("/cars/:id", getCarByID)
+	router.POST("/cars", createCar)
 
 	err := router.Run(fmt.Sprintf(":%d", 8080))
 	if err != nil {

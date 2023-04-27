@@ -2,6 +2,7 @@ package client
 
 import (
 	"fmt"
+	"github.com/google/martian/log"
 	"github.com/pact-foundation/pact-go/dsl"
 	"net/http"
 	"os"
@@ -33,14 +34,18 @@ func TestMain(m *testing.M) {
 	code := m.Run()
 
 	// Shutdown the Mock Service and Write pact files to disk
-	pact.WritePact()
+	err := pact.WritePact()
+	if err != nil {
+		log.Infof("Failed to start you service")
+		return
+	}
 	pact.Teardown()
 
 	os.Exit(code)
 }
 
-func validate() (err error) {
-	url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
+func validateGet() (err error) {
+	url := fmt.Sprintf("http://localhost:%d/cars/1", pact.Server.Port)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return
@@ -56,138 +61,58 @@ func validate() (err error) {
 }
 
 func Test_SomeValuesAndKeysPresence(t *testing.T) {
-	ma2 := make(map[string]string)
-	ma2["title"] = "BMW"
-
 	pact.
 		AddInteraction().
-		Given("Validate SOME values and keys are present").
+		Given("Validate title only").
 		UponReceiving("A GET request").
 		WithRequest(dsl.Request{
 			Method: "GET",
-			Path:   dsl.Term("/cars", "/cars"),
+			Path:   dsl.Term("/cars/1", "/cars/[0-9]+"),
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
 			},
 		}).
 		WillRespondWith(dsl.Response{
 			Status: 200,
-			Body: []map[string]string{
-				ma2, {},
+			Body: map[string]string{
+				"title": "BMW",
 			},
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
 			},
 		})
 
-	err := pact.Verify(validate)
+	err := pact.Verify(validateGet)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
 	}
 }
 
-func Test_SomeKeysPresence(t *testing.T) {
-	ma2 := make(map[string]dsl.Matcher)
-	ma2["title"] = dsl.Like("any string")
-	ma2["id"] = dsl.Like("any string")
-	ma2["color"] = dsl.Like("any string")
-
+func Test_KeysPresence(t *testing.T) {
 	pact.
 		AddInteraction().
-		Given("Validate SOME keys are present").
+		Given("Validate all keys are present").
 		UponReceiving("A GET request").
 		WithRequest(dsl.Request{
 			Method: "GET",
-			Path:   dsl.Term("/cars", "/cars"),
+			Path:   dsl.Term("/cars/1", "/cars/[0-9]+"),
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
 			},
 		}).
 		WillRespondWith(dsl.Response{
 			Status: 200,
-			Body: []map[string]dsl.Matcher{
-				ma2, ma2,
+			Body: map[string]dsl.Matcher{
+				"title": dsl.Term("Toyota", `\w+`),
+				"id":    dsl.Term("300", `\w+`),
+				"color": dsl.Term("Yellow", `\w+`),
 			},
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
 			},
 		})
 
-	err := pact.Verify(validate)
-	if err != nil {
-		t.Fatalf("Error on Verify: %v", err)
-	}
-}
-
-func Test_WholeResponseBody(t *testing.T) {
-	type Car struct {
-		ID    string `json:"id"`
-		Title string `json:"title"`
-		Color string `json:"color"`
-	}
-
-	cars := []Car{
-		{ID: "1", Title: "BMW", Color: "Black"},
-		{ID: "2", Title: "Tesla", Color: "Red"},
-	}
-
-	pact.AddInteraction().
-		Given("Match the whole response body").
-		UponReceiving("A a GET request").
-		WithRequest(dsl.Request{
-			Method: "GET",
-			Path:   dsl.Term("/cars", "/cars"),
-			Headers: dsl.MapMatcher{
-				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
-			},
-		}).
-		WillRespondWith(dsl.Response{
-			Status: 200,
-			Body:   cars,
-			Headers: dsl.MapMatcher{
-				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
-			},
-		})
-
-	err := pact.Verify(validate)
-	if err != nil {
-		t.Fatalf("Error on Verify: %v", err)
-	}
-}
-
-func Test_AllKeysPresence(t *testing.T) {
-	type car struct {
-		ID    dsl.Matcher `json:"id"`
-		Title dsl.Matcher `json:"title"`
-		Color dsl.Matcher `json:"color"`
-	}
-
-	singleCar := car{
-		ID:    dsl.Term("any string", `\w+`),
-		Title: dsl.Term("any string", `\w+`),
-		Color: dsl.Term("any color", `\w+`),
-	}
-
-	pact.
-		AddInteraction().
-		Given("Validate ALL keys are present").
-		UponReceiving("A GET request").
-		WithRequest(dsl.Request{
-			Method: "GET",
-			Path:   dsl.Term("/cars", "/cars"),
-			Headers: dsl.MapMatcher{
-				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
-			},
-		}).
-		WillRespondWith(dsl.Response{
-			Status: 200,
-			Body:   []car{singleCar, singleCar},
-			Headers: dsl.MapMatcher{
-				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
-			},
-		})
-
-	err := pact.Verify(validate)
+	err := pact.Verify(validateGet)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
 	}
@@ -201,4 +126,35 @@ func Test_AllKeysPresence(t *testing.T) {
 		ConsumerVersion: "2.0.2",
 		Tags:            []string{"2.0.2", "latest"},
 	})*/
+}
+
+func Test_WholeBody(t *testing.T) {
+	type Car struct {
+		ID    string `json:"id"`
+		Title string `json:"title"`
+		Color string `json:"color"`
+	}
+
+	pact.AddInteraction().
+		Given("Match the whole response body").
+		UponReceiving("A a GET request").
+		WithRequest(dsl.Request{
+			Method: "GET",
+			Path:   dsl.Term("/cars/1", "/cars/[0-9]+"),
+			Headers: dsl.MapMatcher{
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+			},
+		}).
+		WillRespondWith(dsl.Response{
+			Status: 200,
+			Body:   Car{ID: "1", Title: "BMW", Color: "Black"},
+			Headers: dsl.MapMatcher{
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+			},
+		})
+
+	err := pact.Verify(validateGet)
+	if err != nil {
+		t.Fatalf("Error on Verify: %v", err)
+	}
 }
