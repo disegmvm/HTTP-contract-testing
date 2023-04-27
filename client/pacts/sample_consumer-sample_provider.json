@@ -141,12 +141,12 @@
         },
         "body": [
           {
-            "id": "any number as string",
+            "id": "any string",
             "title": "any string",
             "color": "any color"
           },
           {
-            "id": "any number as string",
+            "id": "any string",
             "title": "any string",
             "color": "any color"
           }
@@ -157,7 +157,8 @@
             "regex": "application\\/json"
           },
           "$.body[0].id": {
-            "match": "type"
+            "match": "regex",
+            "regex": "\\w+"
           },
           "$.body[0].title": {
             "match": "regex",
@@ -168,7 +169,8 @@
             "regex": "\\w+"
           },
           "$.body[1].id": {
-            "match": "type"
+            "match": "regex",
+            "regex": "\\w+"
           },
           "$.body[1].title": {
             "match": "regex",

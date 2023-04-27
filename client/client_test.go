@@ -13,12 +13,6 @@ var dir, _ = os.Getwd()
 var pactDir = fmt.Sprintf("%s/pacts", dir)
 var logDir = fmt.Sprintf("%s/log", dir)
 
-type Car struct {
-	ID    string `json:"id"`
-	Title string `json:"title"`
-	Color string `json:"color"`
-}
-
 func createPact() dsl.Pact {
 	return dsl.Pact{
 		Consumer: "Sample Consumer",
@@ -67,10 +61,6 @@ func Test_SomeKeysPresence(t *testing.T) {
 	ma2["id"] = dsl.Like("any string")
 	ma2["color"] = dsl.Like("any string")
 
-	res := []map[string]dsl.Matcher{
-		ma2, ma2,
-	}
-
 	pact.
 		AddInteraction().
 		Given("Validate SOME keys are present, we don't care there are other additional keys present").
@@ -84,7 +74,9 @@ func Test_SomeKeysPresence(t *testing.T) {
 		}).
 		WillRespondWith(dsl.Response{
 			Status: 200,
-			Body:   res,
+			Body: []map[string]dsl.Matcher{
+				ma2, ma2,
+			},
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
 			},
@@ -111,6 +103,12 @@ func Test_WholeResponseBody(t *testing.T) {
 		}
 
 		return
+	}
+
+	type Car struct {
+		ID    string `json:"id"`
+		Title string `json:"title"`
+		Color string `json:"color"`
 	}
 
 	cars := []Car{
@@ -141,6 +139,7 @@ func Test_WholeResponseBody(t *testing.T) {
 		t.Fatalf("Error on Verify: %v", err)
 	}
 }
+
 func Test_AllKeysPresence(t *testing.T) {
 	var test = func() (err error) {
 		url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
@@ -164,15 +163,10 @@ func Test_AllKeysPresence(t *testing.T) {
 		Color dsl.Matcher `json:"color"`
 	}
 
-	cars := []car{
-		{ID: dsl.Like(
-			"any number as string"),
-			Title: dsl.Term("any string", `\w+`),
-			Color: dsl.Term("any color", `\w+`)},
-		{ID: dsl.Like(
-			"any number as string"),
-			Title: dsl.Term("any string", `\w+`),
-			Color: dsl.Term("any color", `\w+`)},
+	singleCar := car{
+		ID:    dsl.Term("any string", `\w+`),
+		Title: dsl.Term("any string", `\w+`),
+		Color: dsl.Term("any color", `\w+`),
 	}
 
 	pact.
@@ -188,7 +182,7 @@ func Test_AllKeysPresence(t *testing.T) {
 		}).
 		WillRespondWith(dsl.Response{
 			Status: 200,
-			Body:   cars,
+			Body:   []car{singleCar, singleCar},
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
 			},
