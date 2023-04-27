@@ -39,23 +39,23 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func Test_SomeKeysPresence(t *testing.T) {
-	var test = func() (err error) {
-		url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
-		req, err := http.NewRequest("GET", url, nil)
-		if err != nil {
-			return
-		}
-		req.Header.Set("Content-Type", "application/json")
+func validate() (err error) {
+	url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
 
-		_, err = http.DefaultClient.Do(req)
-		if err != nil {
-			return
-		}
-
+	_, err = http.DefaultClient.Do(req)
+	if err != nil {
 		return
 	}
 
+	return
+}
+
+func Test_SomeKeysPresence(t *testing.T) {
 	ma2 := make(map[string]dsl.Matcher)
 	ma2["title"] = dsl.Like("any string")
 	ma2["id"] = dsl.Like("any string")
@@ -82,29 +82,13 @@ func Test_SomeKeysPresence(t *testing.T) {
 			},
 		})
 
-	err := pact.Verify(test)
+	err := pact.Verify(validate)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
 	}
 }
 
 func Test_WholeResponseBody(t *testing.T) {
-	var test = func() (err error) {
-		url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
-		req, err := http.NewRequest("GET", url, nil)
-		if err != nil {
-			return
-		}
-		req.Header.Set("Content-Type", "application/json")
-
-		_, err = http.DefaultClient.Do(req)
-		if err != nil {
-			return
-		}
-
-		return
-	}
-
 	type Car struct {
 		ID    string `json:"id"`
 		Title string `json:"title"`
@@ -134,29 +118,13 @@ func Test_WholeResponseBody(t *testing.T) {
 			},
 		})
 
-	err := pact.Verify(test)
+	err := pact.Verify(validate)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
 	}
 }
 
 func Test_AllKeysPresence(t *testing.T) {
-	var test = func() (err error) {
-		url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
-		req, err := http.NewRequest("GET", url, nil)
-		if err != nil {
-			return
-		}
-		req.Header.Set("Content-Type", "application/json")
-
-		_, err = http.DefaultClient.Do(req)
-		if err != nil {
-			return
-		}
-
-		return
-	}
-
 	type car struct {
 		ID    dsl.Matcher `json:"id"`
 		Title dsl.Matcher `json:"title"`
@@ -188,7 +156,7 @@ func Test_AllKeysPresence(t *testing.T) {
 			},
 		})
 
-	err := pact.Verify(test)
+	err := pact.Verify(validate)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
 	}
