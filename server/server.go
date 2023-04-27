@@ -12,8 +12,9 @@ type Car struct {
 	Color string `json:"color"`
 }
 
-var Cars = Car{
-	ID: "1", Title: "BMW", Color: "Black",
+var Cars = []Car{
+	{ID: "1", Title: "BMW", Color: "Black"},
+	{ID: "2", Title: "Tesla", Color: "Red"},
 }
 
 func main() {
