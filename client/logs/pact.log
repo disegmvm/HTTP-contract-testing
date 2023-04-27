@@ -1,7 +1,7 @@
-I, [2023-04-27T12:42:08.419460 #6732]  INFO -- : Registered expected interaction GET /cars
-D, [2023-04-27T12:42:08.419837 #6732] DEBUG -- : {
-  "description": "A GET request to provider",
-  "providerState": "Valid request",
+I, [2023-04-27T14:36:19.330596 #11344]  INFO -- : Registered expected interaction GET /cars
+D, [2023-04-27T14:36:19.331481 #11344] DEBUG -- : {
+  "description": "A a GET request",
+  "providerState": "Validate the whole response body",
   "request": {
     "method": "GET",
     "path": {
@@ -45,37 +45,41 @@ D, [2023-04-27T12:42:08.419837 #6732] DEBUG -- : {
       }
     },
     "body": {
-      "id": {
-        "json_class": "Pact::SomethingLike",
-        "contents": "1"
+      "json_class": "Pact::ArrayLike",
+      "contents": {
+        "color": {
+          "json_class": "Pact::SomethingLike",
+          "contents": "string"
+        },
+        "id": {
+          "json_class": "Pact::SomethingLike",
+          "contents": "string"
+        },
+        "title": {
+          "json_class": "Pact::SomethingLike",
+          "contents": "string"
+        }
       },
-      "title": {
-        "json_class": "Pact::SomethingLike",
-        "contents": "Vads"
-      },
-      "color": {
-        "json_class": "Pact::SomethingLike",
-        "contents": "Gjhtd"
-      }
+      "min": 1
     }
   },
   "metadata": null
 }
-I, [2023-04-27T12:42:08.420731 #6732]  INFO -- : Received request GET /cars
-D, [2023-04-27T12:42:08.420916 #6732] DEBUG -- : {
+I, [2023-04-27T14:36:19.335010 #11344]  INFO -- : Received request GET /cars
+D, [2023-04-27T14:36:19.335890 #11344] DEBUG -- : {
   "path": "/cars",
   "query": "",
   "method": "get",
   "headers": {
     "Content-Type": "application/json",
-    "Host": "localhost:44599",
+    "Host": "localhost:43641",
     "User-Agent": "Go-http-client/1.1",
     "Accept-Encoding": "gzip",
     "Version": "HTTP/1.1"
   }
 }
-I, [2023-04-27T12:42:08.421157 #6732]  INFO -- : Found matching response for GET /cars
-D, [2023-04-27T12:42:08.421302 #6732] DEBUG -- : {
+I, [2023-04-27T14:36:19.336773 #11344]  INFO -- : Found matching response for GET /cars
+D, [2023-04-27T14:36:19.337414 #11344] DEBUG -- : {
   "status": 200,
   "headers": {
     "Content-Type": {
@@ -91,19 +95,23 @@ D, [2023-04-27T12:42:08.421302 #6732] DEBUG -- : {
     }
   },
   "body": {
-    "id": {
-      "json_class": "Pact::SomethingLike",
-      "contents": "1"
+    "json_class": "Pact::ArrayLike",
+    "contents": {
+      "color": {
+        "json_class": "Pact::SomethingLike",
+        "contents": "string"
+      },
+      "id": {
+        "json_class": "Pact::SomethingLike",
+        "contents": "string"
+      },
+      "title": {
+        "json_class": "Pact::SomethingLike",
+        "contents": "string"
+      }
     },
-    "title": {
-      "json_class": "Pact::SomethingLike",
-      "contents": "Vads"
-    },
-    "color": {
-      "json_class": "Pact::SomethingLike",
-      "contents": "Gjhtd"
-    }
+    "min": 1
   }
 }
-I, [2023-04-27T12:42:08.422065 #6732]  INFO -- : Verifying - interactions matched
-I, [2023-04-27T12:42:08.422617 #6732]  INFO -- : Cleared interactions
+I, [2023-04-27T14:36:19.339854 #11344]  INFO -- : Verifying - interactions matched
+I, [2023-04-27T14:36:19.341757 #11344]  INFO -- : Cleared interactions

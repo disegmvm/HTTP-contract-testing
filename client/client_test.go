@@ -4,17 +4,63 @@ import (
 	"fmt"
 	"github.com/pact-foundation/pact-go/dsl"
 	"net/http"
+	"os"
 	"testing"
 )
 
-func Test_ContractTest(t *testing.T) {
+var pact dsl.Pact
+var dir, _ = os.Getwd()
+var pactDir = fmt.Sprintf("%s/pacts", dir)
+var logDir = fmt.Sprintf("%s/log", dir)
 
-	// Create Pact connecting to local Daemon
-	pact := &dsl.Pact{
+type Car struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
+	Color string `json:"color"`
+}
+
+func createPact() dsl.Pact {
+	return dsl.Pact{
 		Consumer: "Sample Consumer",
 		Provider: "Sample Provider",
+		LogDir:   logDir,
+		PactDir:  pactDir,
 	}
-	defer pact.Teardown()
+}
+
+func TestMain(m *testing.M) {
+	// Setup Pact and related test stuff
+	pact = createPact()
+
+	// Proactively start service to get access to the port
+	pact.Setup(true)
+
+	// Run all the tests
+	code := m.Run()
+
+	// Shutdown the Mock Service and Write pact files to disk
+	pact.WritePact()
+	pact.Teardown()
+
+	os.Exit(code)
+}
+
+func Test_ContractTest(t *testing.T) {
+	var test = func() (err error) {
+		url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
+
+		_, err = http.DefaultClient.Do(req)
+		if err != nil {
+			return
+		}
+
+		return
+	}
 
 	type car struct {
 		ID    dsl.Matcher `json:"id" pact:"example=1"`
@@ -60,22 +106,6 @@ func Test_ContractTest(t *testing.T) {
 			},
 		})
 
-	var test = func() (err error) {
-		url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
-		req, err := http.NewRequest("GET", url, nil)
-		if err != nil {
-			return
-		}
-		req.Header.Set("Content-Type", "application/json")
-
-		_, err = http.DefaultClient.Do(req)
-		if err != nil {
-			return
-		}
-
-		return
-	}
-
 	err := pact.Verify(test)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
@@ -94,4 +124,50 @@ func Test_ContractTest(t *testing.T) {
 		t.Fatal(err)
 	}*/
 
+}
+
+func TestTheWholeResponseBody(t *testing.T) {
+	var test = func() (err error) {
+		url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
+
+		_, err = http.DefaultClient.Do(req)
+		if err != nil {
+			return
+		}
+
+		return
+	}
+
+	cars := []Car{
+		{ID: "1", Title: "BMW", Color: "Black"},
+		{ID: "2", Title: "Tesla", Color: "Red"},
+	}
+
+	pact.AddInteraction().
+		Given("Validate the whole response body").
+		UponReceiving("A a GET request").
+		WithRequest(dsl.Request{
+			Method: "GET",
+			Path:   dsl.Term("/cars", "/cars"),
+			Headers: dsl.MapMatcher{
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+			},
+		}).
+		WillRespondWith(dsl.Response{
+			Status: 200,
+			Body:   dsl.Match(cars),
+			Headers: dsl.MapMatcher{
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+			},
+		})
+
+	err := pact.Verify(test)
+	if err != nil {
+		t.Fatalf("Error on Verify: %v", err)
+	}
 }
