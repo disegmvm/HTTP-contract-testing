@@ -88,6 +88,34 @@ func Test_SomeValuesAndKeysPresence(t *testing.T) {
 	}
 }
 
+func Test_InvalidGetRequest(t *testing.T) {
+	pact.
+		AddInteraction().
+		Given("Error message").
+		UponReceiving("A GET invalid request").
+		WithRequest(dsl.Request{
+			Method: "GET",
+			Path:   dsl.Term("/cars/9999", "/cars/[0-9]+"),
+			Headers: dsl.MapMatcher{
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+			},
+		}).
+		WillRespondWith(dsl.Response{
+			Status: 404,
+			Body: map[string]string{
+				"message": "Requested car is not found",
+			},
+			Headers: dsl.MapMatcher{
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+			},
+		})
+
+	err := pact.Verify(validateGet)
+	if err != nil {
+		t.Fatalf("Error on Verify: %v", err)
+	}
+}
+
 func Test_KeysPresence(t *testing.T) {
 	pact.
 		AddInteraction().
