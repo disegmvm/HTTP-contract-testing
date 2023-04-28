@@ -60,7 +60,7 @@ func validateGet() (err error) {
 	return
 }
 
-func Test_SomeValuesAndKeysPresence(t *testing.T) {
+func TestSomeValuesAndKeys_GET(t *testing.T) {
 	pact.
 		AddInteraction().
 		Given("Validate title only").
@@ -88,7 +88,7 @@ func Test_SomeValuesAndKeysPresence(t *testing.T) {
 	}
 }
 
-func Test_InvalidGetRequest(t *testing.T) {
+func TestInvalidGetRequest_GET(t *testing.T) {
 	pact.
 		AddInteraction().
 		Given("Error message").
@@ -116,7 +116,7 @@ func Test_InvalidGetRequest(t *testing.T) {
 	}
 }
 
-func Test_KeysPresence(t *testing.T) {
+func TestAllKeys_GET(t *testing.T) {
 	pact.
 		AddInteraction().
 		Given("Validate all keys are present").
@@ -156,7 +156,7 @@ func Test_KeysPresence(t *testing.T) {
 	})*/
 }
 
-func Test_WholeBody(t *testing.T) {
+func TestTheWholeBody_GET(t *testing.T) {
 	type Car struct {
 		ID    string `json:"id"`
 		Title string `json:"title"`
