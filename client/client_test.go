@@ -1,11 +1,13 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/google/martian/log"
 	"github.com/pact-foundation/pact-go/dsl"
 	"net/http"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -13,6 +15,14 @@ var pact dsl.Pact
 var dir, _ = os.Getwd()
 var pactDir = fmt.Sprintf("%s/pacts", dir)
 var logDir = fmt.Sprintf("%s/log", dir)
+
+type Car struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
+	Color string `json:"color"`
+}
+
+var createCar = Car{ID: "30", Title: "Toyota", Color: "Yellow"}
 
 func createPact() dsl.Pact {
 	return dsl.Pact{
@@ -44,7 +54,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func validateGet() (err error) {
+func getCar() (err error) {
 	url := fmt.Sprintf("http://localhost:%d/cars/1", pact.Server.Port)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -58,6 +68,52 @@ func validateGet() (err error) {
 	}
 
 	return
+}
+
+func postCar() (err error) {
+	url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
+	jsonPayload, _ := json.Marshal(createCar)
+	req, err := http.NewRequest("POST", url, strings.NewReader(string(jsonPayload)))
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	_, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func TestTheWholeBody_POST(t *testing.T) {
+	//validateCar := Car{Title: "Toyota"}
+
+	pact.
+		AddInteraction().
+		Given("Validate title only").
+		UponReceiving("A POST request").
+		WithRequest(dsl.Request{
+			Method: "POST",
+			Path:   dsl.Term("/cars", "/cars"),
+			Body:   createCar,
+			Headers: dsl.MapMatcher{
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+			},
+		}).
+		WillRespondWith(dsl.Response{
+			Status: 201,
+			Body:   createCar,
+			Headers: dsl.MapMatcher{
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+			},
+		})
+
+	err := pact.Verify(postCar)
+	if err != nil {
+		t.Fatalf("Error on Verify: %v", err)
+	}
 }
 
 func TestSomeValuesAndKeys_GET(t *testing.T) {
@@ -82,7 +138,7 @@ func TestSomeValuesAndKeys_GET(t *testing.T) {
 			},
 		})
 
-	err := pact.Verify(validateGet)
+	err := pact.Verify(getCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
 	}
@@ -110,7 +166,7 @@ func TestInvalidGetRequest_GET(t *testing.T) {
 			},
 		})
 
-	err := pact.Verify(validateGet)
+	err := pact.Verify(getCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
 	}
@@ -140,7 +196,7 @@ func TestAllKeys_GET(t *testing.T) {
 			},
 		})
 
-	err := pact.Verify(validateGet)
+	err := pact.Verify(getCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
 	}
@@ -157,12 +213,6 @@ func TestAllKeys_GET(t *testing.T) {
 }
 
 func TestTheWholeBody_GET(t *testing.T) {
-	type Car struct {
-		ID    string `json:"id"`
-		Title string `json:"title"`
-		Color string `json:"color"`
-	}
-
 	pact.AddInteraction().
 		Given("Match the whole response body").
 		UponReceiving("A a GET request").
@@ -181,7 +231,7 @@ func TestTheWholeBody_GET(t *testing.T) {
 			},
 		})
 
-	err := pact.Verify(validateGet)
+	err := pact.Verify(getCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
 	}
