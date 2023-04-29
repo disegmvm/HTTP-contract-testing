@@ -87,6 +87,23 @@ func postCar() (err error) {
 	return
 }
 
+func postInvalidCar() (err error) {
+	url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
+	jsonPayload, _ := json.Marshal(createCar.ID)
+	req, err := http.NewRequest("POST", url, strings.NewReader(string(jsonPayload)))
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	_, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func TestTheWholeBody_POST(t *testing.T) {
 	pact.
 		AddInteraction().
@@ -114,7 +131,61 @@ func TestTheWholeBody_POST(t *testing.T) {
 	}
 }
 
-func TestSomeValuesAndKeys_POST(t *testing.T) {
+func TestTheWholeBody_GET(t *testing.T) {
+	pact.AddInteraction().
+		Given("Match the whole response body").
+		UponReceiving("A a GET request").
+		WithRequest(dsl.Request{
+			Method: "GET",
+			Path:   dsl.Term("/cars/1", "/cars/[0-9]+"),
+			Headers: dsl.MapMatcher{
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+			},
+		}).
+		WillRespondWith(dsl.Response{
+			Status: 200,
+			Body:   Car{ID: "1", Title: "BMW", Color: "Black"},
+			Headers: dsl.MapMatcher{
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+			},
+		})
+
+	err := pact.Verify(getCar)
+	if err != nil {
+		t.Fatalf("Error on Verify: %v", err)
+	}
+}
+
+func TestSomeKeys_GET(t *testing.T) {
+	pact.
+		AddInteraction().
+		Given("Validate title only").
+		UponReceiving("A GET request").
+		WithRequest(dsl.Request{
+			Method: "GET",
+			Path:   dsl.Term("/cars/1", "/cars/[0-9]+"),
+			Headers: dsl.MapMatcher{
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+			},
+		}).
+		WillRespondWith(dsl.Response{
+			Status: 200,
+			Body: map[string]interface{}{
+				"title": "BMW",
+				"color": dsl.Term("Yellow", `\w+`),
+			},
+			Headers: dsl.MapMatcher{
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+			},
+		})
+
+	err := pact.Verify(getCar)
+	if err != nil {
+		t.Fatalf("Error on Verify: %v", err)
+	}
+}
+
+func TestSomeKeys_POST(t *testing.T) {
 	pact.
 		AddInteraction().
 		Given("Validate title only").
@@ -129,8 +200,9 @@ func TestSomeValuesAndKeys_POST(t *testing.T) {
 		}).
 		WillRespondWith(dsl.Response{
 			Status: 201,
-			Body: map[string]string{
+			Body: map[string]interface{}{
 				"title": "Toyota",
+				"color": dsl.Term("Yellow", `\w+`),
 			},
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
@@ -143,35 +215,7 @@ func TestSomeValuesAndKeys_POST(t *testing.T) {
 	}
 }
 
-func TestSomeValuesAndKeys_GET(t *testing.T) {
-	pact.
-		AddInteraction().
-		Given("Validate title only").
-		UponReceiving("A GET request").
-		WithRequest(dsl.Request{
-			Method: "GET",
-			Path:   dsl.Term("/cars/1", "/cars/[0-9]+"),
-			Headers: dsl.MapMatcher{
-				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
-			},
-		}).
-		WillRespondWith(dsl.Response{
-			Status: 200,
-			Body: map[string]string{
-				"title": "BMW",
-			},
-			Headers: dsl.MapMatcher{
-				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
-			},
-		})
-
-	err := pact.Verify(getCar)
-	if err != nil {
-		t.Fatalf("Error on Verify: %v", err)
-	}
-}
-
-func TestInvalidGetRequest_GET(t *testing.T) {
+func TestInvalidRequest_GET(t *testing.T) {
 	pact.
 		AddInteraction().
 		Given("Error message").
@@ -199,66 +243,29 @@ func TestInvalidGetRequest_GET(t *testing.T) {
 	}
 }
 
-func TestAllKeys_GET(t *testing.T) {
+func TestInvalidRequest_POST(t *testing.T) {
 	pact.
 		AddInteraction().
-		Given("Validate all keys are present").
-		UponReceiving("A GET request").
+		Given("Error message").
+		UponReceiving("A POST request").
 		WithRequest(dsl.Request{
-			Method: "GET",
-			Path:   dsl.Term("/cars/1", "/cars/[0-9]+"),
+			Method: "POST",
+			Path:   dsl.Term("/cars", "/cars"),
+			Body:   createCar.ID,
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
 			},
 		}).
 		WillRespondWith(dsl.Response{
-			Status: 200,
-			Body: map[string]dsl.Matcher{
-				"title": dsl.Term("Toyota", `\w+`),
-				"id":    dsl.Term("300", `\w+`),
-				"color": dsl.Term("Yellow", `\w+`),
-			},
+			Status: 400,
+			//TODO response is in double quotes
+			//Body:   "Provided data is invalid",
 			Headers: dsl.MapMatcher{
-				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+				"Content-Type": dsl.Term("text/plain; charset=utf-8", `text\/plain`),
 			},
 		})
 
-	err := pact.Verify(getCar)
-	if err != nil {
-		t.Fatalf("Error on Verify: %v", err)
-	}
-
-	// specify PACT publisher
-	/*publisher := dsl.Publisher{}
-	err = publisher.Publish(types.PublishRequest{
-		PactURLs: []string{"../client/pacts/consumer_name-provider_name.json"},
-		PactBroker:      "https://pen.pactflow.io/", //link to your remote Contract broker
-		BrokerToken:     "jEQnxw7xWgYRv-3-G7Cx-g",   //your PactFlow token
-		ConsumerVersion: "2.0.2",
-		Tags:            []string{"2.0.2", "latest"},
-	})*/
-}
-
-func TestTheWholeBody_GET(t *testing.T) {
-	pact.AddInteraction().
-		Given("Match the whole response body").
-		UponReceiving("A a GET request").
-		WithRequest(dsl.Request{
-			Method: "GET",
-			Path:   dsl.Term("/cars/1", "/cars/[0-9]+"),
-			Headers: dsl.MapMatcher{
-				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
-			},
-		}).
-		WillRespondWith(dsl.Response{
-			Status: 200,
-			Body:   Car{ID: "1", Title: "BMW", Color: "Black"},
-			Headers: dsl.MapMatcher{
-				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
-			},
-		})
-
-	err := pact.Verify(getCar)
+	err := pact.Verify(postInvalidCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
 	}

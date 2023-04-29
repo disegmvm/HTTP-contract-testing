@@ -31,11 +31,9 @@ func main() {
 func createCar(c *gin.Context) {
 	var newCar Car
 	err := c.BindJSON(&newCar)
-
-	// Return 400 Status Code and error message if invalid data received.
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest,
-			gin.H{"message": "Provided data is invalid"})
+			"Provided data is invalid")
 		return
 	}
 
