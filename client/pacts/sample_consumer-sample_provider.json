@@ -8,7 +8,7 @@
   "interactions": [
     {
       "description": "A POST request",
-      "providerState": "Validate title only",
+      "providerState": "Validate the whole body",
       "request": {
         "method": "POST",
         "path": "/cars",
@@ -40,6 +40,47 @@
           "id": "30",
           "title": "Toyota",
           "color": "Yellow"
+        },
+        "matchingRules": {
+          "$.headers.Content-Type": {
+            "match": "regex",
+            "regex": "application\\/json"
+          }
+        }
+      }
+    },
+    {
+      "description": "A POST request",
+      "providerState": "Validate title only",
+      "request": {
+        "method": "POST",
+        "path": "/cars",
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "body": {
+          "id": "30",
+          "title": "Toyota",
+          "color": "Yellow"
+        },
+        "matchingRules": {
+          "$.path": {
+            "match": "regex",
+            "regex": "\\/cars"
+          },
+          "$.headers.Content-Type": {
+            "match": "regex",
+            "regex": "application\\/json"
+          }
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "body": {
+          "title": "Toyotax"
         },
         "matchingRules": {
           "$.headers.Content-Type": {

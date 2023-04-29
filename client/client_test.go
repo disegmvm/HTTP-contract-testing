@@ -88,8 +88,33 @@ func postCar() (err error) {
 }
 
 func TestTheWholeBody_POST(t *testing.T) {
-	//validateCar := Car{Title: "Toyota"}
+	pact.
+		AddInteraction().
+		Given("Validate the whole body").
+		UponReceiving("A POST request").
+		WithRequest(dsl.Request{
+			Method: "POST",
+			Path:   dsl.Term("/cars", "/cars"),
+			Body:   createCar,
+			Headers: dsl.MapMatcher{
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+			},
+		}).
+		WillRespondWith(dsl.Response{
+			Status: 201,
+			Body:   createCar,
+			Headers: dsl.MapMatcher{
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
+			},
+		})
 
+	err := pact.Verify(postCar)
+	if err != nil {
+		t.Fatalf("Error on Verify: %v", err)
+	}
+}
+
+func TestSomeValuesAndKeys_POST(t *testing.T) {
 	pact.
 		AddInteraction().
 		Given("Validate title only").
@@ -104,7 +129,9 @@ func TestTheWholeBody_POST(t *testing.T) {
 		}).
 		WillRespondWith(dsl.Response{
 			Status: 201,
-			Body:   createCar,
+			Body: map[string]string{
+				"title": "Toyota",
+			},
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
 			},
