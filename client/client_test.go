@@ -258,9 +258,9 @@ func TestInvalidRequest_POST(t *testing.T) {
 			},
 		}).
 		WillRespondWith(dsl.Response{
-			Status: 404,
+			Status: 400,
 			Body: map[string]string{
-				"message": "No ID provided",
+				"message": "ID must not be empty",
 			},
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),

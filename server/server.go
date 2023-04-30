@@ -28,25 +28,6 @@ func main() {
 	}
 }
 
-func createCar(c *gin.Context) {
-	var newCar Car
-	err := c.BindJSON(&newCar)
-	if err != nil {
-		c.IndentedJSON(http.StatusNotFound,
-			gin.H{"message": "Invalid data provided"})
-		return
-	}
-
-	if newCar.ID == "" {
-		c.IndentedJSON(http.StatusNotFound,
-			gin.H{"message": "No ID provided"})
-		return
-	}
-
-	Cars = append(Cars, newCar)
-	c.IndentedJSON(http.StatusCreated, newCar)
-}
-
 func getCarByID(c *gin.Context) {
 	for _, car := range Cars {
 		if car.ID == c.Param("id") {
@@ -58,4 +39,26 @@ func getCarByID(c *gin.Context) {
 	// Return 404 Status Code and error message if no car was found.
 	c.IndentedJSON(http.StatusNotFound,
 		gin.H{"message": "Requested car is not found"})
+}
+
+func createCar(c *gin.Context) {
+	var newCar Car
+	err := c.BindJSON(&newCar)
+
+	// Return 400 Status Code and error message if provided data is invalid.
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest,
+			gin.H{"message": "Invalid data provided"})
+		return
+	}
+
+	// Return 400 Status Code and error message if no ID was provided.
+	if newCar.ID == "" {
+		c.IndentedJSON(http.StatusBadRequest,
+			gin.H{"message": "ID must not be empty"})
+		return
+	}
+
+	Cars = append(Cars, newCar)
+	c.IndentedJSON(http.StatusCreated, newCar)
 }
