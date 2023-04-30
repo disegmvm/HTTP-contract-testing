@@ -22,7 +22,8 @@ type Car struct {
 	Color string `json:"color"`
 }
 
-var createCar = Car{ID: "30", Title: "Toyota", Color: "Yellow"}
+var validCar = Car{ID: "30", Title: "Toyota", Color: "Yellow"}
+var invalidCar = Car{ID: "", Title: "Toyota", Color: "Yellow"}
 
 func createPact() dsl.Pact {
 	return dsl.Pact{
@@ -72,7 +73,7 @@ func getCar() (err error) {
 
 func postCar() (err error) {
 	url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
-	jsonPayload, _ := json.Marshal(createCar)
+	jsonPayload, _ := json.Marshal(validCar)
 	req, err := http.NewRequest("POST", url, strings.NewReader(string(jsonPayload)))
 	if err != nil {
 		return
@@ -89,7 +90,7 @@ func postCar() (err error) {
 
 func postInvalidCar() (err error) {
 	url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
-	jsonPayload, _ := json.Marshal(createCar.ID)
+	jsonPayload, _ := json.Marshal(invalidCar)
 	req, err := http.NewRequest("POST", url, strings.NewReader(string(jsonPayload)))
 	if err != nil {
 		return
@@ -112,14 +113,14 @@ func TestTheWholeBody_POST(t *testing.T) {
 		WithRequest(dsl.Request{
 			Method: "POST",
 			Path:   dsl.Term("/cars", "/cars"),
-			Body:   createCar,
+			Body:   validCar,
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
 			},
 		}).
 		WillRespondWith(dsl.Response{
 			Status: 201,
-			Body:   createCar,
+			Body:   validCar,
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
 			},
@@ -193,7 +194,7 @@ func TestSomeKeys_POST(t *testing.T) {
 		WithRequest(dsl.Request{
 			Method: "POST",
 			Path:   dsl.Term("/cars", "/cars"),
-			Body:   createCar,
+			Body:   validCar,
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
 			},
@@ -251,17 +252,18 @@ func TestInvalidRequest_POST(t *testing.T) {
 		WithRequest(dsl.Request{
 			Method: "POST",
 			Path:   dsl.Term("/cars", "/cars"),
-			Body:   createCar.ID,
+			Body:   invalidCar,
 			Headers: dsl.MapMatcher{
 				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
 			},
 		}).
 		WillRespondWith(dsl.Response{
-			Status: 400,
-			//TODO response is in double quotes
-			//Body:   "Provided data is invalid",
+			Status: 404,
+			Body: map[string]string{
+				"message": "No ID provided",
+			},
 			Headers: dsl.MapMatcher{
-				"Content-Type": dsl.Term("text/plain; charset=utf-8", `text\/plain`),
+				"Content-Type": dsl.Term("application/json; charset=utf-8", `application\/json`),
 			},
 		})
 

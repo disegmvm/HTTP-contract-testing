@@ -32,8 +32,14 @@ func createCar(c *gin.Context) {
 	var newCar Car
 	err := c.BindJSON(&newCar)
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest,
-			"Provided data is invalid")
+		c.IndentedJSON(http.StatusNotFound,
+			gin.H{"message": "Invalid data provided"})
+		return
+	}
+
+	if newCar.ID == "" {
+		c.IndentedJSON(http.StatusNotFound,
+			gin.H{"message": "No ID provided"})
 		return
 	}
 
