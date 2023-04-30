@@ -221,8 +221,8 @@
         },
         "body": {
           "id": "",
-          "title": "Toyota",
-          "color": "Yellow"
+          "title": "Kia",
+          "color": ""
         },
         "matchingRules": {
           "$.path": {

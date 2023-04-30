@@ -23,7 +23,7 @@ type Car struct {
 }
 
 var validCar = Car{ID: "30", Title: "Toyota", Color: "Yellow"}
-var invalidCar = Car{ID: "", Title: "Toyota", Color: "Yellow"}
+var invalidCar = Car{Title: "Kia"}
 
 func createPact() dsl.Pact {
 	return dsl.Pact{
@@ -44,29 +44,23 @@ func TestMain(m *testing.M) {
 	// Run all the tests
 	code := m.Run()
 
-	// Shutdown the Mock Service and Write pact files to disk
+	// Shutdown the Mock Service and write pact files to disk
 	err := pact.WritePact()
 	if err != nil {
-		log.Infof("Failed to start you service")
+		log.Infof("Failed to write your contract")
 		return
 	}
-	pact.Teardown()
 
+	pact.Teardown()
 	os.Exit(code)
 }
 
 func getCar() (err error) {
 	url := fmt.Sprintf("http://localhost:%d/cars/1", pact.Server.Port)
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return
-	}
+	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
 
-	_, err = http.DefaultClient.Do(req)
-	if err != nil {
-		return
-	}
+	http.DefaultClient.Do(req)
 
 	return
 }
@@ -74,16 +68,10 @@ func getCar() (err error) {
 func postCar() (err error) {
 	url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
 	jsonPayload, _ := json.Marshal(validCar)
-	req, err := http.NewRequest("POST", url, strings.NewReader(string(jsonPayload)))
-	if err != nil {
-		return
-	}
+	req, _ := http.NewRequest("POST", url, strings.NewReader(string(jsonPayload)))
 	req.Header.Set("Content-Type", "application/json")
 
-	_, err = http.DefaultClient.Do(req)
-	if err != nil {
-		return
-	}
+	http.DefaultClient.Do(req)
 
 	return
 }
@@ -91,16 +79,10 @@ func postCar() (err error) {
 func postInvalidCar() (err error) {
 	url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
 	jsonPayload, _ := json.Marshal(invalidCar)
-	req, err := http.NewRequest("POST", url, strings.NewReader(string(jsonPayload)))
-	if err != nil {
-		return
-	}
+	req, _ := http.NewRequest("POST", url, strings.NewReader(string(jsonPayload)))
 	req.Header.Set("Content-Type", "application/json")
 
-	_, err = http.DefaultClient.Do(req)
-	if err != nil {
-		return
-	}
+	http.DefaultClient.Do(req)
 
 	return
 }

@@ -2,15 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/pact-foundation/pact-go/types"
 	"log"
 	"os"
 	"testing"
 )
-
-var router *gin.Engine
 
 func TestServerPact_Verification(t *testing.T) {
 
@@ -51,12 +48,5 @@ func TestServerPact_Verification(t *testing.T) {
 }
 
 func startProvider() {
-	router = gin.Default()
-	router.GET("/cars/:id", getCarByID)
-	router.POST("/cars", createCar)
-
-	err := router.Run(fmt.Sprintf(":%d", 8080))
-	if err != nil {
-		log.Print("Failed to start you service")
-	}
+	main()
 }
