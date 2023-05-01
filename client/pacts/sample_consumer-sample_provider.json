@@ -8,7 +8,7 @@
   "interactions": [
     {
       "description": "A POST request",
-      "providerState": "Validate the whole body",
+      "providerState": "Validate the whole response body",
       "request": {
         "method": "POST",
         "path": "/cars",
@@ -50,8 +50,8 @@
       }
     },
     {
-      "description": "A a GET request",
-      "providerState": "Match the whole response body",
+      "description": "A GET request",
+      "providerState": "Validate the whole response body",
       "request": {
         "method": "GET",
         "path": "/cars/1",
@@ -89,7 +89,7 @@
     },
     {
       "description": "A GET request",
-      "providerState": "Validate title only",
+      "providerState": "Validate title and color",
       "request": {
         "method": "GET",
         "path": "/cars/1",
@@ -130,7 +130,7 @@
     },
     {
       "description": "A POST request",
-      "providerState": "Validate title only",
+      "providerState": "Validate title and color",
       "request": {
         "method": "POST",
         "path": "/cars",
@@ -175,8 +175,8 @@
       }
     },
     {
-      "description": "A GET invalid request",
-      "providerState": "Error message",
+      "description": "A GET request with invalid ID",
+      "providerState": "Validate error message",
       "request": {
         "method": "GET",
         "path": "/cars/9999",
@@ -211,8 +211,8 @@
       }
     },
     {
-      "description": "A POST request",
-      "providerState": "Error message",
+      "description": "A POST request with no ID provided",
+      "providerState": "Validate error message",
       "request": {
         "method": "POST",
         "path": "/cars",

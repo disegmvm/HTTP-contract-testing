@@ -16,15 +16,6 @@ var dir, _ = os.Getwd()
 var pactDir = fmt.Sprintf("%s/pacts", dir)
 var logDir = fmt.Sprintf("%s/log", dir)
 
-type Car struct {
-	ID    string `json:"id"`
-	Title string `json:"title"`
-	Color string `json:"color"`
-}
-
-var validCar = Car{ID: "30", Title: "Toyota", Color: "Yellow"}
-var invalidCar = Car{Title: "Kia"}
-
 func createPact() dsl.Pact {
 	return dsl.Pact{
 		Consumer: "Sample Consumer",
@@ -65,6 +56,15 @@ func getCar() (err error) {
 	return
 }
 
+type Car struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
+	Color string `json:"color"`
+}
+
+var validCar = Car{ID: "30", Title: "Toyota", Color: "Yellow"}
+var invalidCar = Car{Title: "Kia"}
+
 func postCar() (err error) {
 	url := fmt.Sprintf("http://localhost:%d/cars", pact.Server.Port)
 	jsonPayload, _ := json.Marshal(validCar)
@@ -90,7 +90,7 @@ func postInvalidCar() (err error) {
 func TestTheWholeBody_POST(t *testing.T) {
 	pact.
 		AddInteraction().
-		Given("Validate the whole body").
+		Given("Validate the whole response body").
 		UponReceiving("A POST request").
 		WithRequest(dsl.Request{
 			Method: "POST",
@@ -116,8 +116,8 @@ func TestTheWholeBody_POST(t *testing.T) {
 
 func TestTheWholeBody_GET(t *testing.T) {
 	pact.AddInteraction().
-		Given("Match the whole response body").
-		UponReceiving("A a GET request").
+		Given("Validate the whole response body").
+		UponReceiving("A GET request").
 		WithRequest(dsl.Request{
 			Method: "GET",
 			Path:   dsl.Term("/cars/1", "/cars/[0-9]+"),
@@ -142,7 +142,7 @@ func TestTheWholeBody_GET(t *testing.T) {
 func TestSomeKeys_GET(t *testing.T) {
 	pact.
 		AddInteraction().
-		Given("Validate title only").
+		Given("Validate title and color").
 		UponReceiving("A GET request").
 		WithRequest(dsl.Request{
 			Method: "GET",
@@ -154,7 +154,11 @@ func TestSomeKeys_GET(t *testing.T) {
 		WillRespondWith(dsl.Response{
 			Status: 200,
 			Body: map[string]interface{}{
+
+				// Key + value validation
 				"title": "BMW",
+
+				// Validate exact key + the format of value
 				"color": dsl.Term("Yellow", `\w+`),
 			},
 			Headers: dsl.MapMatcher{
@@ -171,7 +175,7 @@ func TestSomeKeys_GET(t *testing.T) {
 func TestSomeKeys_POST(t *testing.T) {
 	pact.
 		AddInteraction().
-		Given("Validate title only").
+		Given("Validate title and color").
 		UponReceiving("A POST request").
 		WithRequest(dsl.Request{
 			Method: "POST",
@@ -184,7 +188,11 @@ func TestSomeKeys_POST(t *testing.T) {
 		WillRespondWith(dsl.Response{
 			Status: 201,
 			Body: map[string]interface{}{
+
+				// Key + value validation
 				"title": "Toyota",
+
+				// Validate exact key + the format of value
 				"color": dsl.Term("Yellow", `\w+`),
 			},
 			Headers: dsl.MapMatcher{
@@ -201,8 +209,8 @@ func TestSomeKeys_POST(t *testing.T) {
 func TestInvalidRequest_GET(t *testing.T) {
 	pact.
 		AddInteraction().
-		Given("Error message").
-		UponReceiving("A GET invalid request").
+		Given("Validate error message").
+		UponReceiving("A GET request with invalid ID").
 		WithRequest(dsl.Request{
 			Method: "GET",
 			Path:   dsl.Term("/cars/9999", "/cars/[0-9]+"),
@@ -229,8 +237,8 @@ func TestInvalidRequest_GET(t *testing.T) {
 func TestInvalidRequest_POST(t *testing.T) {
 	pact.
 		AddInteraction().
-		Given("Error message").
-		UponReceiving("A POST request").
+		Given("Validate error message").
+		UponReceiving("A POST request with no ID provided").
 		WithRequest(dsl.Request{
 			Method: "POST",
 			Path:   dsl.Term("/cars", "/cars"),
