@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/google/martian/log"
 	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/types"
 	"net/http"
 	"os"
 	"strings"
@@ -108,10 +109,24 @@ func TestTheWholeBody_POST(t *testing.T) {
 			},
 		})
 
-	err := pact.Verify(postCar)
+	// Store contract remotely
+	publisher := dsl.Publisher{}
+	err := publisher.Publish(types.PublishRequest{
+		PactURLs:        []string{"../client/pacts/sample_consumer-sample_provider.json"},
+		PactBroker:      "https://pen.pactflow.io/", //link to your remote Contract broker
+		BrokerToken:     "jEQnxw7xWgYRv-3-G7Cx-g",   //your PactFlow token
+		ConsumerVersion: "1.0.0",
+		Tags:            []string{"1.0.0", "latest"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Uncomment to verify contract locally
+	/*err := pact.Verify(postCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
-	}
+	}*/
 }
 
 func TestTheWholeBody_GET(t *testing.T) {
@@ -133,10 +148,24 @@ func TestTheWholeBody_GET(t *testing.T) {
 			},
 		})
 
-	err := pact.Verify(getCar)
+	// Store contract remotely
+	publisher := dsl.Publisher{}
+	err := publisher.Publish(types.PublishRequest{
+		PactURLs:        []string{"../client/pacts/sample_consumer-sample_provider.json"},
+		PactBroker:      "https://pen.pactflow.io/", //link to your remote Contract broker
+		BrokerToken:     "jEQnxw7xWgYRv-3-G7Cx-g",   //your PactFlow token
+		ConsumerVersion: "1.0.0",
+		Tags:            []string{"1.0.0", "latest"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Uncomment to verify contract locally
+	/*err := pact.Verify(getCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
-	}
+	}*/
 }
 
 func TestSomeKeys_GET(t *testing.T) {
@@ -166,10 +195,24 @@ func TestSomeKeys_GET(t *testing.T) {
 			},
 		})
 
-	err := pact.Verify(getCar)
+	// Store contract remotely
+	publisher := dsl.Publisher{}
+	err := publisher.Publish(types.PublishRequest{
+		PactURLs:        []string{"../client/pacts/sample_consumer-sample_provider.json"},
+		PactBroker:      "https://pen.pactflow.io/", //link to your remote Contract broker
+		BrokerToken:     "jEQnxw7xWgYRv-3-G7Cx-g",   //your PactFlow token
+		ConsumerVersion: "1.0.0",
+		Tags:            []string{"1.0.0", "latest"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Uncomment to verify contract locally
+	/*err := pact.Verify(getCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
-	}
+	}*/
 }
 
 func TestSomeKeys_POST(t *testing.T) {
@@ -200,10 +243,24 @@ func TestSomeKeys_POST(t *testing.T) {
 			},
 		})
 
-	err := pact.Verify(postCar)
+	// Store contract remotely
+	publisher := dsl.Publisher{}
+	err := publisher.Publish(types.PublishRequest{
+		PactURLs:        []string{"../client/pacts/sample_consumer-sample_provider.json"},
+		PactBroker:      "https://pen.pactflow.io/", //link to your remote Contract broker
+		BrokerToken:     "jEQnxw7xWgYRv-3-G7Cx-g",   //your PactFlow token
+		ConsumerVersion: "1.0.0",
+		Tags:            []string{"1.0.0", "latest"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Uncomment to verify contract locally
+	/*err := pact.Verify(postCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
-	}
+	}*/
 }
 
 func TestInvalidRequest_GET(t *testing.T) {
@@ -228,10 +285,24 @@ func TestInvalidRequest_GET(t *testing.T) {
 			},
 		})
 
-	err := pact.Verify(getCar)
+	// Store contract remotely
+	publisher := dsl.Publisher{}
+	err := publisher.Publish(types.PublishRequest{
+		PactURLs:        []string{"../client/pacts/sample_consumer-sample_provider.json"},
+		PactBroker:      "https://pen.pactflow.io/", //link to your remote Contract broker
+		BrokerToken:     "jEQnxw7xWgYRv-3-G7Cx-g",   //your PactFlow token
+		ConsumerVersion: "1.0.0",
+		Tags:            []string{"1.0.0", "latest"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Uncomment to verify contract locally
+	/*err := pact.Verify(getCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
-	}
+	}*/
 }
 
 func TestInvalidRequest_POST(t *testing.T) {
@@ -257,8 +328,22 @@ func TestInvalidRequest_POST(t *testing.T) {
 			},
 		})
 
-	err := pact.Verify(postInvalidCar)
+	// Store contract remotely
+	publisher := dsl.Publisher{}
+	err := publisher.Publish(types.PublishRequest{
+		PactURLs:        []string{"../client/pacts/sample_consumer-sample_provider.json"},
+		PactBroker:      "https://pen.pactflow.io/", //link to your remote Contract broker
+		BrokerToken:     "jEQnxw7xWgYRv-3-G7Cx-g",   //your PactFlow token
+		ConsumerVersion: "1.0.0",
+		Tags:            []string{"1.0.0", "latest"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Uncomment to verify contract locally
+	/*err := pact.Verify(postInvalidCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
-	}
+	}*/
 }
