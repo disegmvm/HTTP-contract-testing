@@ -109,7 +109,6 @@ func TestTheWholeBody_POST(t *testing.T) {
 			},
 		})
 
-	// Uncomment to verify contract locally
 	err := pact.Verify(postCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
@@ -148,7 +147,6 @@ func TestTheWholeBody_GET(t *testing.T) {
 			},
 		})
 
-	// Uncomment to verify contract locally
 	err := pact.Verify(getCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
@@ -195,7 +193,6 @@ func TestSomeKeys_GET(t *testing.T) {
 			},
 		})
 
-	// Uncomment to verify contract locally
 	err := pact.Verify(getCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
@@ -243,7 +240,6 @@ func TestSomeKeys_POST(t *testing.T) {
 			},
 		})
 
-	// Uncomment to verify contract locally
 	err := pact.Verify(postCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
@@ -285,7 +281,6 @@ func TestInvalidRequest_GET(t *testing.T) {
 			},
 		})
 
-	// Uncomment to verify contract locally
 	err := pact.Verify(getCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
@@ -328,7 +323,6 @@ func TestInvalidRequest_POST(t *testing.T) {
 			},
 		})
 
-	// Uncomment to verify contract locally
 	err := pact.Verify(postInvalidCar)
 	if err != nil {
 		t.Fatalf("Error on Verify: %v", err)
